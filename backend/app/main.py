@@ -35,9 +35,9 @@ register_exception_handlers(app)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",   # Vite dev server
-        "http://localhost:3000",   # CRA / alternate port
-        "*",                       # replace with deployed frontend URL before going live
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://ims-tau-nine.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
