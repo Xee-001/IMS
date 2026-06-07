@@ -8,6 +8,7 @@ import Spinner from "../components/Spinner";
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     Promise.all([getProducts(), getCustomers(), getOrders()])
@@ -16,10 +17,35 @@ export default function Dashboard() {
         const totalRevenue = orders.reduce((s, o) => s + o.total_price, 0);
         setStats({ products, customers, orders, lowStock, totalRevenue });
       })
+      .catch(() => setError("Could not connect to the backend API."))
       .finally(() => setLoading(false));
   }, []);
 
   if (loading) return <Spinner />;
+
+  if (error || !stats) {
+    return (
+      <div>
+        <h1 className="page-title">Dashboard</h1>
+        <div className="alert alert-error" style={{ marginTop: "1rem" }}>
+          {error || "Failed to load data."} Make sure the backend is running and VITE_API_URL is correct.
+        </div>
+        <div className="stats-grid" style={{ marginTop: "1.5rem" }}>
+          {[
+            { label: "Total Products", value: "--", to: "/products", color: "card-blue" },
+            { label: "Total Customers", value: "--", to: "/customers", color: "card-green" },
+            { label: "Total Orders", value: "--", to: "/orders", color: "card-purple" },
+            { label: "Total Revenue", value: "--", to: "/orders", color: "card-orange" },
+          ].map((c) => (
+            <Link key={c.label} to={c.to} className={`stat-card ${c.color}`}>
+              <div className="stat-value">{c.value}</div>
+              <div className="stat-label">{c.label}</div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   const cards = [
     { label: "Total Products", value: stats.products.length, to: "/products", color: "card-blue" },
